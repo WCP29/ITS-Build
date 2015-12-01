@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Point and Click to Data</title>
+    
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/mapToData.css" type="text/css" />
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <!-- JS -->
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="js/mapToData.js"></script>
+        <!-- Bootstrap -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+    
+</head>
+<body>
+    <div id="menu">
+            <ul id="menu-list">
+                <li>
+                    <div class="dropdown">
+                      <button class="btn btn-primary btn-xs dropdown-toggle" type="button" id="FeaturesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            Features
+                            <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="FeaturesDropdown">
+                          <li class="dropdown-header">Rooms</li>
+                            <li id="feat-room" class="feature-list"><a href="#">Classroom</a></li>
+                            <li id="feat-office" class="feature-list"><a href="#">Office</a></li>
+                            <li id="feat-bathroom" class="feature-list"><a href="#">Bathroom</a></li>
+                          <li class="dropdown-header">Traveling</li>
+                            <li id="feat-hallway" class="feature-list"><a href="#">Hallway</a></li>
+                            <li id="feat-staircase" class="feature-list"><a href="#">Staircase</a></li>
+                            <li id="feat-entrance" class="feature-list"><a href="#">Entrance</a></li>
+                            <li id="feat-ramp" class="feature-list"><a href="#">Ramps</a></li>
+                            <li id="feat-elevator" class="feature-list"><a href="#">Elevator</a></li>
+                            <li id="feat-construction" class="feature-list"><a href="#">Construction</a></li>
+                          <li class="dropdown-header">Emergencies</li>
+                            <li id="feat-aed" class="feature-list"><a href="#">AED</a></li>
+                            <li id="feat-emergexit" class="feature-list"><a href="#">Emergency Exit</a></li>
+                            <li id="feat-water" class="feature-list"><a href="#">Water Fountain</a></li>
+                            
+                      </ul>
+                    </div>
+                </li>
+                <li><button id="JSONClick" class="btn btn-primary btn-xs sharp">JSON Output</button></li>
+                <li><span id="image_coords_now">&nbsp;</span></li>
+            </ul>
+    </div>
+        <canvas id="myCanvas"></canvas>
+
+</body>
+</html>

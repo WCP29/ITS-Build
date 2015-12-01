@@ -43,11 +43,10 @@ $( document ).ready(function() {
     $('#myCanvas').attr('width', $('#myCanvas').css('width'));
  
   getActiveCoordinates();
-  //activeFeature();
   
-  var currentFeature = activeFeature();
+  activeFeature();
   
-  handleCanvasClick(currentFeature);
+  handleCanvasClick();
   
   outputJSON();
 
@@ -64,134 +63,38 @@ function getActiveCoordinates(){
         });
 }
 
-
-/*REWRITE ATTEMPT TO SQUASH BUG (Outline 1)*/
-function handleCanvasClick(currentFeature) {
-    $('#myCanvas').on('click', function(e) {
-    console.log('currentFeature:' + currentFeature);
-    if (!currentFeature) {
-      console.log('Select something from the features menu!');
-      return;
-    }
-
-    if (currentFeature == 'hallway') {
-      createPath();
-    }
-    else if( currentFeature == "feat-room") {
-        addNode('room', '#000000', null);
-    }
-    else if( currentFeature == "feat-office") {
-        addNode('office', '#000000', null);
-    }
-    else if( currentFeature == "feat-bathroom") {
-        addNode('bathroom', '#FFFF00', null);
-    }
-    else if( currentFeature == "feat-water") {
-        addNode('water_fountain', '#1E90FF', 'y');
-    }
-    else if(currentFeature == "feat-staircase") {
-        addNode('stair', '#00FF00', 'n');
-    }
-    else if(currentFeature == "feat-entrance") {
-        addNode('entrance', '#00FF00', 'y');
-    }
-    else if(currentFeature == "feat-ramp") {
-        addNode('ramp', '#0000FF', 'y');
-    }
-    else if(currentFeature == "feat-elevator") {
-        addNode('elevator', '#0000FF', 'y');
-    }
-    else if(currentFeature == "feat-construction") {
-        addNode('construction', '#808080', 'y');
-    }
-    else if(currentFeature == "feat-aed") {
-        addNode('aed', '#FF0000', null);
-    }
-    else {
-        /*currentFeature == "feat-emergexit"*/
-        addNode('emergency_exit', '#FF0000', null);
-    }
-  });
-    
-}
-
-
-
-
-/* After having selected from the features menu, this function will incorporate the node/hallway
-to the canvas */
-function addFeature() {
-        var itemActive = $('.featureSelect').attr("id");
-        console.log('Active Item is: ' + itemActive);
-        if( itemActive == "feat-room") {
-            addNode('room', '#000000', null);
-            return;
-        }
-        else if( itemActive == "feat-office") {
-            addNode('office', '#000000', null);
-            return;
-        }
-        else if( itemActive == "feat-bathroom") {
-            addNode('bathroom', '#FFFF00', null);
-            return;
-        }
-        else if( itemActive == "feat-water") {
-            addNode('water_fountain', '#1E90FF', 'y');
-            return;
-        }
-        else if(itemActive == "feat-staircase") {
-            addNode('stair', '#00FF00', 'n');
-            return;
-        }
-        else if(itemActive == "feat-entrance") {
-            addNode('entrance', '#00FF00', 'y');
-            return;
-        }
-        else if(itemActive == "feat-ramp") {
-            addNode('ramp', '#0000FF', 'y');
-            return;
-        }
-        else if(itemActive == "feat-elevator") {
-            addNode('elevator', '#0000FF', 'y');
-            return;
-        }
-        else if(itemActive == "feat-construction") {
-            addNode('construction', '#808080', 'y');
-            return;
-        }
-        else if(itemActive == "feat-aed") {
-             addNode('aed', '#FF0000', null);
-             return;
-        }
-        else if(itemActive == "feat-emergexit") {
-            addNode('emergency_exit', '#FF0000', null);
-            return;
-        }
-        else if (itemActive == null) {
-            console.log('Select something from the features menu!');
-        }
-        else { //if itemActive == 'feat-hallway'
-                createPath();
-            return;
-        }
-}
 /*Function determines what feature is currently being used for the creation of nodes
 and lines [features]*/
 function activeFeature() {
      $('.feature-list').on('click', function() {
-        var clickedOn = $(this).attr("id");
-        console.log('clicked on:' + clickedOn);
+       var clickedOn = $(this).attr("id");
         $('.feature-list').removeClass('featureSelect');
-        console.log('anyone have featureSelect? ' + $('.featureSelect').attr("id"));
         $('#'+clickedOn).addClass('featureSelect');
-        console.log('added featureSelect to ' + $('.featureSelect').attr("id"));
-        return clickedOn;
      });
+}
+
+/*REWRITE ATTEMPT TO SQUASH BUG (Outline 1)*/
+function handleCanvasClick() {
+    $('#myCanvas').on('click', function(e) {
+        var featureSettings = getFeatureSettings();
+    if (!featureSettings) {
+      console.log('Select something from the features menu!');
+      return;
+    }
+
+    if (featureSettings.name == 'hallway') {
+      createPath(featureSettings, e);
+    }
+    else {
+        addNode(featureSettings, e)
+    }
+  });
+    
 }
 /*Function that actually adds the nodes to the canvas. It intakes what feature it is adding,
 the color for that node (each feature has its own color (except some) and if the feature is 
 accessible. It will then input that information into the array of objects.*/
-function addNode(feature, color, accessibility) {
+function addNode(featureSettings, e) {
         $('#myCanvas').on('click',function(e){
             nodeID++;
             var x = e.pageX - this.offsetLeft;
@@ -199,39 +102,40 @@ function addNode(feature, color, accessibility) {
     
             
             var ctx= this.getContext("2d");
-            ctx.fillStyle = color;
+            ctx.fillStyle = featureSettings.color;
             ctx.beginPath();
             ctx.arc(x, y, 6,0, 2*Math.PI);
             ctx.stroke();
             ctx.closePath();
             ctx.fill();
-            
+            console.log('nodeID adding why?!' + nodeID);
             var featID = prompt('What ID number would you like to give this feature?');
-            if (accessibility == null) {
-             accessibility = prompt('Is this accessible? Please type y or n.');
+            var access = featureSettings.accessibility;
+            if (access == null) {
+             access = prompt('Is this accessible? Please type y or n.');
             }
             
                features.push({
                    node_id : 'node' + nodeID,
-                   feat_name: feature,
-                   feat_id : feature + featID,
+                   feat_name: featureSettings.name,
+                   feat_id : featureSettings.name + featID,
                    x_cord : window.current_x,
                    y_cord : window.current_y,
-                   accessible : accessibility
+                   accessible : access
                });
                console.log('features after push: \n');
                console.log(JSON.stringify(features));
-               hoverNode(nodeID);
+           // return null; 
+           
+           //KEEPS ADDING TO NODE+ and REPEATS number of node times! Like Fibonacci....WEIRD!
         });
-        
-    return;    
 } 
 
 function createPath() {
     var mouse = {
     x: -1,
     y: -1
-};
+    };
     var cvs = $("#myCanvas")[0].getContext("2d");
     $("#myCanvas").click(function(e){
         if(mouse.x != -1 && mouse.y != -1){
@@ -251,6 +155,55 @@ function createPath() {
     });
     return false;
 }
+
+function getFeatureSettings() {
+    var itemActive = $('.featureSelect').attr("id");
+    if (!itemActive) return null;
+    
+    switch (itemActive) {
+    case "feat-room":
+      return { name: "room", color: "#000000", accessibility: null };
+    
+    case "feat-office":
+        return { name: "office", color: "#000000", accessibility: null };
+        
+    case "feat-bathroom":
+        return { name: "bathroom", color: "#FFFF00", accessibility: null };
+        
+    case "feat-water":
+      return { name: "water_fountain", color: "#1E90FF", accessibility: 'y' };
+      
+    case "feat-staircase":
+        return { name: "stair", color: "#00FF00", accessibility: 'n' };
+        
+    case "feat-entrance":
+        return { name: "entrance", color: "#00FF00", accessibility: 'y' };
+        
+    case "feat-ramp":
+        return { name: "ramp", color: "#0000FF", accessibility: 'y' };
+        
+    case "feat-elevator":
+        return { name: "elevator", color: "#0000FF", accessibility: 'y' };
+        
+    case "feat-construction":
+        return { name: "construction", color: "#808080", accessibility: 'y' };
+        
+    case "feat-aed":
+        return { name: "aed", color: "#FF0000", accessibility: null };
+    
+    case "feat-hallway":
+        return { name: "hallway", color: "#7D26CD", accessibility: 'y' };
+    default: "feat-hallway"
+  } 
+}
+
+function outputJSON() {
+    $('#JSONClick').on('click', function() {
+        var myWindow = window.open("", "JSON Output", "width=600, height=400");
+        myWindow.document.write(JSON.stringify(features));
+    })
+}
+
 /*MAY NEED TO REWRITE THIS SINCE CANVAS ELEMENTS DO NOT HAVE ID's or ELEMENTS*/
 function hoverNode(nodeID) {
     console.log('nodeID in start of hoverMode: ' + nodeID);
@@ -281,11 +234,5 @@ function hoverNode(nodeID) {
             });
 }
 
-function outputJSON() {
-    $('#JSONClick').on('click', function() {
-        var myWindow = window.open("", "JSON Output", "width=600, height=400");
-        myWindow.document.write(JSON.stringify(features));
-    })
-}
 
 // IMPLEMENT CODE TO GRAB FROM ARRAY TO PHP TO SQL!!!!!!!

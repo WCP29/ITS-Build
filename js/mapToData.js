@@ -1,10 +1,11 @@
 /*
 Goals and Notes (statuses):
 
-    - DEBUG the constant onclick handler. The a consecutive feature will be interfered with
-    a previous feature, even with on and off flags I have set for them. Going to fix this
-    by rewriting the functions that implement this.
-    
+    *************COMPLETE****************************************************************************
+    *    - DEBUG the constant onclick handler. The a consecutive feature will be interfered with    *
+    *    a previous feature, even with on and off flags I have set for them. Going to fix this      *
+    *    by rewriting the functions that implement this.                                            *
+    *************************************************************************************************
             -- DEBUG: CLICK and drag position of the node changes the nodes.
         *** Status:
                     -
@@ -36,6 +37,9 @@ Goals and Notes (statuses):
 var features = [];
 var nodeID = 0;
 var lineID = 0;
+var pathGen = false;
+var cPushArray = new Array();
+var cStep = -1;
 
 
 $( document ).ready(function() {
@@ -75,6 +79,10 @@ function activeFeature() {
 
 /*REWRITE ATTEMPT TO SQUASH BUG (Outline 1)*/
 function handleCanvasClick() {
+     var mouse = {
+        x: -1,
+        y: -1
+        };
     $('#myCanvas').on('click', function(e) {
         var featureSettings = getFeatureSettings();
     if (!featureSettings) {
@@ -83,19 +91,41 @@ function handleCanvasClick() {
     }
 
     if (featureSettings.name == 'hallway') {
-      createPath(featureSettings, e);
+        /*Function that generates a path on the screen!*/
+        var cvs = $("#myCanvas")[0].getContext("2d");
+            if(mouse.x != -1 && mouse.y != -1){
+                cvs.beginPath();
+                cvs.moveTo(mouse.x, mouse.y);
+                cvs.lineTo(e.pageX, e.pageY);
+                cvs.closePath();
+                 pathGen = true;
+                cvs.lineWidth = 14;
+                cvs.strokeStyle = '#7D26CD';
+                cvs.stroke();
+                // Store data to JSON
+                features.push({
+                   node_id : 'Hallway' + lineID,
+                   feat_name: featureSettings.name,
+                   feat_id : featureSettings.name + lineID,
+                   x_cord1 : mouse.x,
+                   y_cord1 : mouse.y,
+                   x_cord2 : e.pageX,
+                   y_cord2 : e.pageY,
+               });
+                
+                mouse.x = -1;
+                mouse.y = -1;
+            }else{
+                mouse.x = e.pageX;
+                mouse.y = e.pageY;
+            }
+            console.log('features after push: \n');
+            console.log(JSON.stringify(features));
     }
     else {
-        addNode(featureSettings, e)
-    }
-  });
-    
-}
-/*Function that actually adds the nodes to the canvas. It intakes what feature it is adding,
-the color for that node (each feature has its own color (except some) and if the feature is 
-accessible. It will then input that information into the array of objects.*/
-function addNode(featureSettings, e) {
-        $('#myCanvas').on('click',function(e){
+       /*Function that actually adds the nodes to the canvas. It intakes what feature it is adding,
+        the color for that node (each feature has its own color (except some) and if the feature is 
+        accessible. It will then input that information into the array of objects.*/
             nodeID++;
             var x = e.pageX - this.offsetLeft;
             var y = e.pageY - this.offsetTop; 
@@ -103,6 +133,10 @@ function addNode(featureSettings, e) {
             
             var ctx= this.getContext("2d");
             ctx.fillStyle = featureSettings.color;
+            if (pathGen) {
+                ctx.strokeStyle = featureSettings.color;
+                ctx.lineWidth = 1;
+            }
             ctx.beginPath();
             ctx.arc(x, y, 6,0, 2*Math.PI);
             ctx.stroke();
@@ -125,37 +159,13 @@ function addNode(featureSettings, e) {
                });
                console.log('features after push: \n');
                console.log(JSON.stringify(features));
-           // return null; 
-           
-           //KEEPS ADDING TO NODE+ and REPEATS number of node times! Like Fibonacci....WEIRD!
-        });
-} 
-
-function createPath() {
-    var mouse = {
-    x: -1,
-    y: -1
-    };
-    var cvs = $("#myCanvas")[0].getContext("2d");
-    $("#myCanvas").click(function(e){
-        if(mouse.x != -1 && mouse.y != -1){
-            cvs.beginPath();
-            cvs.moveTo(mouse.x, mouse.y);
-            cvs.lineTo(e.pageX, e.pageY);
-            cvs.closePath();
-            cvs.lineWidth = 14;
-            cvs.strokeStyle = '#7D26CD';
-            cvs.stroke();
-            mouse.x = -1;
-            mouse.y = -1;
-        }else{
-            mouse.x = e.pageX;
-            mouse.y = e.pageY;
-        }
-    });
-    return false;
+       
+    }
+  });
+    
 }
-
+/*Function that fills the information necessary to create a NODE or a HALLWAY by
+identifying what feature was selected from the drop down menu*/
 function getFeatureSettings() {
     var itemActive = $('.featureSelect').attr("id");
     if (!itemActive) return null;
@@ -193,9 +203,40 @@ function getFeatureSettings() {
     
     case "feat-hallway":
         return { name: "hallway", color: "#7D26CD", accessibility: 'y' };
-    default: "feat-hallway"
+    default: 
+        return { name: "hallway", color: "#7D26CD", accessibility: 'y' };
   } 
 }
+
+// All of the below function will help contribute to the UNDO / REDO capabilities
+function undoAndRedo() {
+    var ctx = $('#myCanvas').getContext("2d");
+    function pushOrderArray() {
+        cStep++;
+        if (cStep < cPushArray.length) { cPushArray.length = cStep; }
+        cPushArray.push(document.getElementById('myCanvas').toDataURL());
+    }
+    
+    function undoDrawing() {
+        if (cStep > 0) {
+            cStep--;
+            var canvasPic = new Image();
+            canvasPic.src = cPushArray[cStep];
+            canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
+        }
+    }
+    
+    function redoDrawing() {
+         if (cStep < cPushArray.length-1) {
+        cStep++;
+        var canvasPic = new Image();
+        canvasPic.src = cPushArray[cStep];
+        canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
+    }
+    }
+}
+
+/****************************************************************************/
 
 function outputJSON() {
     $('#JSONClick').on('click', function() {

@@ -218,21 +218,25 @@ function undoAndRedo() {
     }
     
     function undoDrawing() {
-        if (cStep > 0) {
-            cStep--;
-            var canvasPic = new Image();
-            canvasPic.src = cPushArray[cStep];
-            canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
-        }
+        $('#undoButton').on('click', function() {
+            if (cStep > 0) {
+                cStep--;
+                var canvasPic = new Image();
+                canvasPic.src = cPushArray[cStep];
+                canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
+            }
+        });
     }
     
     function redoDrawing() {
-         if (cStep < cPushArray.length-1) {
-        cStep++;
-        var canvasPic = new Image();
-        canvasPic.src = cPushArray[cStep];
-        canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
-    }
+        $('#redoButton').on('click', function() {
+             if (cStep < cPushArray.length-1) {
+                cStep++;
+                var canvasPic = new Image();
+                canvasPic.src = cPushArray[cStep];
+                canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
+            }
+        });
     }
 }
 

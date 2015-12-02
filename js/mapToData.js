@@ -35,11 +35,10 @@ Goals and Notes (statuses):
 
 
 var features = [];
+var temp = []; // For undo and redo
 var nodeID = 0;
 var lineID = 0;
 var pathGen = false;
-var cPushArray = new Array();
-var cStep = -1;
 
 
 $( document ).ready(function() {
@@ -51,6 +50,9 @@ $( document ).ready(function() {
   activeFeature();
   
   handleCanvasClick();
+  
+  undoDrawing();
+  redoDrawing();
   
   outputJSON();
 
@@ -103,6 +105,7 @@ function handleCanvasClick() {
                 cvs.strokeStyle = '#7D26CD';
                 cvs.stroke();
                 // Store data to JSON
+             var d = Math.sqrt((e.pageX -= mouse.x)*e.pageX + (e.pageY-= mouse.y)*e.pageY);
                 features.push({
                    node_id : 'Hallway' + lineID,
                    feat_name: featureSettings.name,
@@ -111,6 +114,17 @@ function handleCanvasClick() {
                    y_cord1 : mouse.y,
                    x_cord2 : e.pageX,
                    y_cord2 : e.pageY,
+                   distance : d,
+               });
+               temp.push({
+                   node_id : 'Hallway' + lineID,
+                   feat_name: featureSettings.name,
+                   feat_id : featureSettings.name + lineID,
+                   x_cord1 : mouse.x,
+                   y_cord1 : mouse.y,
+                   x_cord2 : e.pageX,
+                   y_cord2 : e.pageY,
+                   distance : d,
                });
                 
                 mouse.x = -1;
@@ -121,6 +135,9 @@ function handleCanvasClick() {
             }
             console.log('features after push: \n');
             console.log(JSON.stringify(features));
+            
+             undoDrawing();
+             redoDrawing();
     }
     else {
        /*Function that actually adds the nodes to the canvas. It intakes what feature it is adding,
@@ -142,7 +159,6 @@ function handleCanvasClick() {
             ctx.stroke();
             ctx.closePath();
             ctx.fill();
-            console.log('nodeID adding why?!' + nodeID);
             var featID = prompt('What ID number would you like to give this feature?');
             var access = featureSettings.accessibility;
             if (access == null) {
@@ -157,12 +173,22 @@ function handleCanvasClick() {
                    y_cord : window.current_y,
                    accessible : access
                });
+               temp.push({
+                   node_id : 'node' + nodeID,
+                   feat_name: featureSettings.name,
+                   feat_id : featureSettings.name + featID,
+                   x_cord : window.current_x,
+                   y_cord : window.current_y,
+                   accessible : access
+               });
                console.log('features after push: \n');
                console.log(JSON.stringify(features));
+               
+                undoDrawing();
+                redoDrawing();
        
     }
   });
-    
 }
 /*Function that fills the information necessary to create a NODE or a HALLWAY by
 identifying what feature was selected from the drop down menu*/
@@ -209,35 +235,84 @@ function getFeatureSettings() {
 }
 
 // All of the below function will help contribute to the UNDO / REDO capabilities
-function undoAndRedo() {
-    var ctx = $('#myCanvas').getContext("2d");
-    function pushOrderArray() {
-        cStep++;
-        if (cStep < cPushArray.length) { cPushArray.length = cStep; }
-        cPushArray.push(document.getElementById('myCanvas').toDataURL());
-    }
-    
-    function undoDrawing() {
-        $('#undoButton').on('click', function() {
-            if (cStep > 0) {
-                cStep--;
-                var canvasPic = new Image();
-                canvasPic.src = cPushArray[cStep];
-                canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
-            }
+function undoDrawing() {
+    var ctx = $('#myCanvas')[0].getContext("2d");
+    var undoButton = $('#undoButton');
+    if (features == '') {
+        undoButton.css(
+        {
+            "cursor": "not-allowed"
         });
     }
-    
-    function redoDrawing() {
-        $('#redoButton').on('click', function() {
-             if (cStep < cPushArray.length-1) {
-                cStep++;
-                var canvasPic = new Image();
-                canvasPic.src = cPushArray[cStep];
-                canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
+    else {
+            undoButton.css(
+        {
+            "background-color": "#D9534F",
+            "border": "1px solid #D9534F",
+            "cursor": "pointer"
+        });
+    undoButton.on('click', function() {
+        //Grab from the last element of features and color over it. Check to see if delete is actually possible
+            var featuresLength = features.length;
+            var lastElement = features[featuresLength-1];
+             var ctx= $('#myCanvas')[0].getContext("2d");
+            if (lastElement.feat_name == "hallway") {
+                ctx.beginPath();
+                ctx.moveTo(lastElement.x_cord1, lastElement.y_cord1);
+                ctx.lineTo(lastElement.x_cord2, lastElement.y_cord2);
+                ctx.closePath();
+                 pathGen = true;
+                ctx.lineWidth = 14;
+                ctx.strokeStyle = 'white';
+                ctx.stroke();
             }
+            else {
+                 var x = lastElement.x_cord;
+                 var y = lastElement.y_cord; 
+        
+                
+                ctx.fillStyle = "white";
+                if (pathGen) {
+                    ctx.strokeStyle = "white";
+                    ctx.lineWidth = 1;
+                }
+                ctx.beginPath();
+                ctx.arc(x, y, 6,0, 2*Math.PI);
+                ctx.stroke();
+                ctx.closePath();
+                ctx.fill();
+        
+            }
+        
+        var removedFeature = features.pop();
+        console.log('Removed:' + removedFeature);
+        console.log('features after POP: \n');
+        console.log(JSON.stringify(features));
+    });
+    }
+}
+    
+function redoDrawing() {
+     var ctx = $('#myCanvas')[0].getContext("2d");
+     var redoButton = $('#redoButton');
+    if (features == '') {
+        console.log('empty');
+        redoButton.css(
+        {
+            "cursor": "not-allowed"
         });
     }
+    else {
+          redoButton.css(
+        {
+            "background-color": "#31B0D5",
+            "border": "1px solid #31B0D5",
+            "cursor": "pointer"
+        });
+    }
+    redoButton.on('click', function() {
+             
+    });
 }
 
 /****************************************************************************/

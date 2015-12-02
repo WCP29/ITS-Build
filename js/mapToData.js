@@ -39,11 +39,17 @@ var temp = []; // For undo and redo
 var nodeID = 0;
 var lineID = 0;
 var pathGen = false;
+var restorePoints = []; // For undo function
+//var featID = null;
+//var access = null;
 
 
 $( document ).ready(function() {
     $('#myCanvas').attr('height', $('#myCanvas').css('height'));
     $('#myCanvas').attr('width', $('#myCanvas').css('width'));
+    
+    $('#inputAccess').hide();
+    $('#inputID').hide();
  
   getActiveCoordinates();
   
@@ -51,8 +57,8 @@ $( document ).ready(function() {
   
   handleCanvasClick();
   
-  undoDrawing();
-  redoDrawing();
+  //undoDrawing();
+  //redoDrawing();
   
   outputJSON();
 
@@ -72,7 +78,8 @@ function getActiveCoordinates(){
 /*Function determines what feature is currently being used for the creation of nodes
 and lines [features]*/
 function activeFeature() {
-     $('.feature-list').on('click', function() {
+     $('.feature-list').on('click', function(e) {
+       e.preventDefault();    
        var clickedOn = $(this).attr("id");
         $('.feature-list').removeClass('featureSelect');
         $('#'+clickedOn).addClass('featureSelect');
@@ -87,107 +94,142 @@ function handleCanvasClick() {
         };
     $('#myCanvas').on('click', function(e) {
         var featureSettings = getFeatureSettings();
-    if (!featureSettings) {
-      console.log('Select something from the features menu!');
-      return;
-    }
-
-    if (featureSettings.name == 'hallway') {
-        /*Function that generates a path on the screen!*/
-        var cvs = $("#myCanvas")[0].getContext("2d");
-            if(mouse.x != -1 && mouse.y != -1){
-                cvs.beginPath();
-                cvs.moveTo(mouse.x, mouse.y);
-                cvs.lineTo(e.pageX, e.pageY);
-                cvs.closePath();
-                 pathGen = true;
-                cvs.lineWidth = 14;
-                cvs.strokeStyle = '#7D26CD';
-                cvs.stroke();
-                // Store data to JSON
-             var d = Math.sqrt((e.pageX -= mouse.x)*e.pageX + (e.pageY-= mouse.y)*e.pageY);
-                features.push({
-                   node_id : 'Hallway' + lineID,
-                   feat_name: featureSettings.name,
-                   feat_id : featureSettings.name + lineID,
-                   x_cord1 : mouse.x,
-                   y_cord1 : mouse.y,
-                   x_cord2 : e.pageX,
-                   y_cord2 : e.pageY,
-                   distance : d,
-               });
-               temp.push({
-                   node_id : 'Hallway' + lineID,
-                   feat_name: featureSettings.name,
-                   feat_id : featureSettings.name + lineID,
-                   x_cord1 : mouse.x,
-                   y_cord1 : mouse.y,
-                   x_cord2 : e.pageX,
-                   y_cord2 : e.pageY,
-                   distance : d,
-               });
+        if (!featureSettings) {
+          console.log('Select something from the features menu!');
+          return;
+        }
+       // undoDrawing();
+        if (featureSettings.name == 'hallway') {
+            /*Function that generates a path on the screen!*/
+            var cvs = $("#myCanvas")[0].getContext("2d");
+                if(mouse.x != -1 && mouse.y != -1){
+                    cvs.beginPath();
+                    cvs.moveTo(mouse.x, mouse.y);
+                    cvs.lineTo(e.pageX, e.pageY);
+                    cvs.closePath();
+                     pathGen = true;
+                    cvs.lineWidth = 14;
+                    cvs.strokeStyle = '#7D26CD';
+                    cvs.stroke();
+                    lineID++;
+                    // Store data to JSON
+                 var d = Math.sqrt((e.pageX -= mouse.x)*e.pageX + (e.pageY-= mouse.y)*e.pageY);
+                    features.push({
+                       node_id : 'Hallway' + lineID,
+                       feat_name: featureSettings.name,
+                       feat_id : featureSettings.name + lineID,
+                       x_cord1 : mouse.x,
+                       y_cord1 : mouse.y,
+                       x_cord2 : e.pageX,
+                       y_cord2 : e.pageY,
+                       distance : d,
+                   });
+                   temp.unshift({
+                       node_id : 'Hallway' + lineID,
+                       feat_name: featureSettings.name,
+                       feat_id : featureSettings.name + lineID,
+                       x_cord1 : mouse.x,
+                       y_cord1 : mouse.y,
+                       x_cord2 : e.pageX,
+                       y_cord2 : e.pageY,
+                       distance : d,
+                   });
+                    
+                    mouse.x = -1;
+                    mouse.y = -1;
+                }else{
+                    mouse.x = e.pageX;
+                    mouse.y = e.pageY;
+                }
+                console.log('features after push: \n');
+                console.log(JSON.stringify(features));
                 
-                mouse.x = -1;
-                mouse.y = -1;
-            }else{
-                mouse.x = e.pageX;
-                mouse.y = e.pageY;
-            }
-            console.log('features after push: \n');
-            console.log(JSON.stringify(features));
-            
-             undoDrawing();
-             redoDrawing();
-    }
-    else {
-       /*Function that actually adds the nodes to the canvas. It intakes what feature it is adding,
-        the color for that node (each feature has its own color (except some) and if the feature is 
-        accessible. It will then input that information into the array of objects.*/
-            nodeID++;
-            var x = e.pageX - this.offsetLeft;
-            var y = e.pageY - this.offsetTop; 
-    
-            
-            var ctx= this.getContext("2d");
-            ctx.fillStyle = featureSettings.color;
-            if (pathGen) {
-                ctx.strokeStyle = featureSettings.color;
-                ctx.lineWidth = 1;
-            }
-            ctx.beginPath();
-            ctx.arc(x, y, 6,0, 2*Math.PI);
-            ctx.stroke();
-            ctx.closePath();
-            ctx.fill();
-            var featID = prompt('What ID number would you like to give this feature?');
-            var access = featureSettings.accessibility;
-            if (access == null) {
-             access = prompt('Is this accessible? Please type y or n.');
-            }
-            
-               features.push({
-                   node_id : 'node' + nodeID,
-                   feat_name: featureSettings.name,
-                   feat_id : featureSettings.name + featID,
-                   x_cord : window.current_x,
-                   y_cord : window.current_y,
-                   accessible : access
-               });
-               temp.push({
-                   node_id : 'node' + nodeID,
-                   feat_name: featureSettings.name,
-                   feat_id : featureSettings.name + featID,
-                   x_cord : window.current_x,
-                   y_cord : window.current_y,
-                   accessible : access
-               });
-               console.log('features after push: \n');
-               console.log(JSON.stringify(features));
-               
-                undoDrawing();
-                redoDrawing();
-       
-    }
+                 //undoDrawing();
+                 //redoDrawing();
+        }
+        else {
+           /*Function that actually adds the nodes to the canvas. It intakes what feature it is adding,
+            the color for that node (each feature has its own color (except some) and if the feature is 
+            accessible. It will then input that information into the array of objects.*/
+                nodeID++;
+                var x = e.pageX - this.offsetLeft;
+                var y = e.pageY - this.offsetTop; 
+        
+                
+                var ctx= this.getContext("2d");
+                ctx.fillStyle = featureSettings.color;
+                if (pathGen) {
+                    ctx.strokeStyle = featureSettings.color;
+                    ctx.lineWidth = 1;
+                }
+                ctx.beginPath();
+                ctx.arc(x, y, 6,0, 2*Math.PI);
+                ctx.stroke();
+                ctx.closePath();
+                ctx.fill();
+                
+                    /*$('#inputID').show();
+                    if (!featID) {
+                         $('#inputID').focus();
+                    }
+                    $('#inputID').keydown(function(e) {
+		            if (e.which == 13) {
+			            e.preventDefault(); // Do not reload on submission
+			            featID = $('#inputID').val();
+			            $('#inputID').hide();
+			             $('#inputAccess').focus();
+		            } 
+                })
+                */
+                var featID = prompt('What ID number would you like to give this feature?');
+                var access = featureSettings.accessibility;
+                if (access == null) {
+                 access = prompt('Is this accessible? Please type y or n.');
+                 /*
+                    $('#inputAccess').show();
+                    //$('#inputAccess').focus();
+                    $('#inputAccess').keydown(function(e) {
+		                if (e.which == 13) {
+			                e.preventDefault(); // Do not reload on submission
+			                access = $('#inputAccess').val();
+			                console.log('access');
+			                $('#inputAccess').hide();
+		                } 
+                    }) 
+                 */
+                 
+                }
+                
+                   features.push({
+                       node_id : 'node' + nodeID,
+                       feat_name: featureSettings.name,
+                       feat_id : featureSettings.name + featID,
+                       x_cord : window.current_x,
+                       y_cord : window.current_y,
+                       accessible : access
+                   });
+                   temp.unshift({
+                       node_id : 'node' + nodeID,
+                       feat_name: featureSettings.name,
+                       feat_id : featureSettings.name + featID,
+                       x_cord : window.current_x,
+                       y_cord : window.current_y,
+                       accessible : access
+                   });
+                   console.log('features after push: \n');
+                   console.log(JSON.stringify(features));
+                   
+                    //undoDrawing();
+                    //redoDrawing();
+                    
+                    
+                    /****************DEBUG ATTEMPT ***********/
+                
+                    
+                    
+                    /****************DEBUG ATTEMPT ***********/
+           
+        }
   });
 }
 /*Function that fills the information necessary to create a NODE or a HALLWAY by
@@ -236,7 +278,7 @@ function getFeatureSettings() {
 
 // All of the below function will help contribute to the UNDO / REDO capabilities
 function undoDrawing() {
-    var ctx = $('#myCanvas')[0].getContext("2d");
+    //var ctx = $('#myCanvas')[0].getContext("2d");
     var undoButton = $('#undoButton');
     if (features == '') {
         undoButton.css(
@@ -251,44 +293,44 @@ function undoDrawing() {
             "border": "1px solid #D9534F",
             "cursor": "pointer"
         });
-    undoButton.on('click', function() {
-        //Grab from the last element of features and color over it. Check to see if delete is actually possible
-            var featuresLength = features.length;
-            var lastElement = features[featuresLength-1];
-             var ctx= $('#myCanvas')[0].getContext("2d");
-            if (lastElement.feat_name == "hallway") {
-                ctx.beginPath();
-                ctx.moveTo(lastElement.x_cord1, lastElement.y_cord1);
-                ctx.lineTo(lastElement.x_cord2, lastElement.y_cord2);
-                ctx.closePath();
-                 pathGen = true;
-                ctx.lineWidth = 14;
-                ctx.strokeStyle = 'white';
-                ctx.stroke();
-            }
-            else {
-                 var x = lastElement.x_cord;
-                 var y = lastElement.y_cord; 
-        
-                
-                ctx.fillStyle = "white";
-                if (pathGen) {
-                    ctx.strokeStyle = "white";
-                    ctx.lineWidth = 1;
+        undoButton.on('click', function(e) {
+            //Grab from the last element of features and delete it.
+            e.preventDefault();
+            var lastElement = features[(features.length - 1)];
+                if (lastElement.feat_name == 'hallway') {
+                    lineID--;
                 }
-                ctx.beginPath();
-                ctx.arc(x, y, 6,0, 2*Math.PI);
-                ctx.stroke();
-                ctx.closePath();
-                ctx.fill();
-        
-            }
-        
-        var removedFeature = features.pop();
-        console.log('Removed:' + removedFeature);
-        console.log('features after POP: \n');
-        console.log(JSON.stringify(features));
-    });
+                else {
+                    nodeID++;
+                }
+                var removedFeature = features.pop();
+                console.log('Removed:' + removedFeature);
+                console.log('features after POP: \n');
+                console.log(JSON.stringify(features));
+                var canvas = document.getElementById('myCanvas');
+                var ctx= canvas.getContext("2d");
+                var imgSrc = canvas.toDataURL("image/png");
+                restorePoints.push(imgSrc);
+                //console.log('restorePoints: ' + restorePoints);
+                
+                var oImg = new Image();
+                //console.log('oImg: ' + oImg);
+                oImg.onload = function() {
+                    var canvas = document.getElementById('myCanvas');
+                    var ctx= canvas.getContext("2d");
+                    // Store the current transformation matrix
+                    //ctx.save();
+                    
+                    // Use the identity matrix while clearing the canvas
+                    //ctx.setTransform(1, 0, 0, 1, 0, 0);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Restore the transform
+                    //ctx.restore();
+                    ctx.drawImage(oImg, 0, 0);
+                }
+                oImg.src = restorePoints.pop();
+        });
     }
 }
     
@@ -318,7 +360,8 @@ function redoDrawing() {
 /****************************************************************************/
 
 function outputJSON() {
-    $('#JSONClick').on('click', function() {
+    $('#JSONClick').on('click', function(e) {
+        e.preventDefault();
         var myWindow = window.open("", "JSON Output", "width=600, height=400");
         myWindow.document.write(JSON.stringify(features));
     })

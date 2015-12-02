@@ -46,3 +46,48 @@
 .info::first-line {
    font-weight: bold;   
 }
+
+#prompts {
+    background-color: black;
+    color: white;
+    height: 60px;
+    width: 60%;
+    position: fixed;
+    margin-left: 350px;
+}
+
+#inputID {
+	color: white;
+	font-size: 12px;
+	width: 300px;
+	text-align: center;
+	background-color: transparent;
+	border-style: none none solid none;
+	border-color: white;
+}
+
+#inputAccess {
+    color: white;
+	font-size: 12px;
+	width: 100px;
+	text-align: center;
+	background-color: transparent;
+	border-style: none none solid none;
+	border-color: white;
+}
+
+#inputID:focus, #inputAccess:focus {
+	outline: none;	
+}
+::-webkit-input-placeholder {
+   color: white;
+}
+:-moz-placeholder {
+   color: white;  
+}
+::-moz-placeholder {
+   color: white;  
+}
+:-ms-input-placeholder {  
+   color: white;  
+}

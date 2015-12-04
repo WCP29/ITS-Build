@@ -105,6 +105,49 @@ function activeFeature() {
        var clickedOn = $(this).attr("id");
         $('.feature-list').removeClass('featureSelect');
         $('#'+clickedOn).addClass('featureSelect');
+    
+        function outputMe() {
+            switch (clickedOn) {
+                case "feat-room":
+                  return { name: "Room" };
+                
+                case "feat-office":
+                    return { name: "Office"};
+                    
+                case "feat-bathroom":
+                    return { name: "Bathroom"};
+                    
+                case "feat-water":
+                  return { name: "Water Fountain"};
+                  
+                case "feat-staircase":
+                    return { name: "Stairway"};
+                    
+                case "feat-entrance":
+                    return { name: "Entrance"};
+                    
+                case "feat-ramp":
+                    return { name: "Ramp"};
+                    
+                case "feat-elevator":
+                    return { name: "Elevator"};
+                    
+                case "feat-construction":
+                    return { name: "Construction"};
+                    
+                case "feat-aed":
+                    return { name: "AED"};
+                
+                case "feat-hallway":
+                    return { name: "Hallway"};
+                default: 
+                    return { name: "Hallway"};
+              } 
+        }
+        /*Display what feature was selected*/
+        var showMe = outputMe();
+        $('#showFeature').remove();
+        $('#JSONClick').parent().after('<li id="showFeature"><p>Feature Selected: ' + showMe.name + '</p></li>');
      });
 }
 
@@ -116,10 +159,12 @@ function handleCanvasClick() {
         };
     $('#myCanvas').on('click', function(e) {
         var featureSettings = getFeatureSettings();
+        
         if (!featureSettings) {
           console.log('Select something from the features menu!');
           return;
         }
+        
        // undoDrawing();
         if (featureSettings.name == 'hallway') {
             /*Function that generates a path on the screen!*/
@@ -258,6 +303,7 @@ function handleCanvasClick() {
 identifying what feature was selected from the drop down menu*/
 function getFeatureSettings() {
     var itemActive = $('.featureSelect').attr("id");
+    
     if (!itemActive) return null;
     
     switch (itemActive) {

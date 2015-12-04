@@ -12,11 +12,24 @@
     <!-- JS -->
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="js/mapToData.js"></script>
+        <!-- TypeAhead -->
+        <script src = "http://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
         <!-- Bootstrap -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
     
 </head>
 <body>
+    
+    <!-- Opening Menu -->
+			<div class="overlay" id="modal">
+				<div class="content">
+				    <h1 id = "modal-title"> MapBuilder</h1>
+				    <input class="typeahead" id="whatBuilding" type="text" placeholder="What building do you want to populate?">
+				    <br>
+				    <input class="typeahead" id="whatFloor" type="text" placeholder="What floor?">
+				</div>
+			</div>
+    
     <div id="menu">
             <ul id="menu-list">
                 <li>

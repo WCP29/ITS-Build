@@ -1,3 +1,41 @@
+/*onLoad Section*/
+.overlay {
+	width: 100%;
+	height: 100%;
+	color: #fff;
+	background: #6D969C;
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin: 0;
+	z-index: 1000;
+	display: none;
+}
+.overlay > .content {
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    text-align: center;
+}
+#modal-title {
+    font-size: 60px;
+    text-align: center;
+}
+.typeahead {
+    color: white;
+	font-size: 20px;
+	width: 500px;
+	text-align: center;
+	background-color: transparent;
+	border-style: none none solid none;
+	border-color: white;
+}
+#whatBuilding {
+    margin-top: 15%;
+}
+#whatFloor {
+   margin-top: 7%; 
+}
 /*Menu Section*/
 #menu {
     position: fixed;
@@ -76,7 +114,7 @@
 	border-color: white;
 }
 
-#inputID:focus, #inputAccess:focus {
+#inputID:focus, #inputAccess:focus #whatFloor:focus, #whatBuilding:focus {
 	outline: none;	
 }
 ::-webkit-input-placeholder {

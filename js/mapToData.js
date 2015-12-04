@@ -45,11 +45,15 @@ var restorePoints = []; // For undo function
 
 
 $( document ).ready(function() {
+    
+    
     $('#myCanvas').attr('height', $('#myCanvas').css('height'));
     $('#myCanvas').attr('width', $('#myCanvas').css('width'));
     
-    $('#inputAccess').hide();
-    $('#inputID').hide();
+    //startModal();
+    
+    //$('#inputAccess').hide();
+    //$('#inputID').hide();
  
   getActiveCoordinates();
   
@@ -63,6 +67,24 @@ $( document ).ready(function() {
   outputJSON();
 
 });
+
+/* This is the modal that will fade in when faculty opens the application. It will feature a
+searchable dropdown that will allow faculty to choose what building they will interact with.
+After they select the floor of the building they searched for and found, the menu will disappear
+and load the blueprint of the respective floor of the building respected as the background image 
+of the Canvas.
+
+ FUNCTION STATUS: INCOMPLETE!
+*/
+function startModal() {
+    $(".overlay").fadeIn(1000);
+    $("#menu, #myCanvas").hide();
+    
+    /*****
+    Currently a template of the opening modal, but has absolutely no functionality just yet.
+    ******/
+}
+
 //Function that constantly displays where the mouse is.
 function getActiveCoordinates(){
      $('#myCanvas').mousemove( function(event) {
@@ -167,20 +189,20 @@ function handleCanvasClick() {
                 ctx.stroke();
                 ctx.closePath();
                 ctx.fill();
-                
-                    /*$('#inputID').show();
+        /*        
+                    $('#inputID').show();
                     if (!featID) {
                          $('#inputID').focus();
                     }
                     $('#inputID').keydown(function(e) {
 		            if (e.which == 13) {
 			            e.preventDefault(); // Do not reload on submission
-			            featID = $('#inputID').val();
+			            var featID = $('#inputID').val();
 			            $('#inputID').hide();
 			             $('#inputAccess').focus();
 		            } 
                 })
-                */
+            */
                 var featID = prompt('What ID number would you like to give this feature?');
                 var access = featureSettings.accessibility;
                 if (access == null) {
@@ -196,8 +218,8 @@ function handleCanvasClick() {
 			                $('#inputAccess').hide();
 		                } 
                     }) 
-                 */
                  
+                 */
                 }
                 
                    features.push({

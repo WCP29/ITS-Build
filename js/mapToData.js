@@ -248,10 +248,10 @@ function handleCanvasClick() {
 		            } 
                 })
             */
-                var featID = prompt('What ID number would you like to give this feature?');
+                var featID = prompt('What ID number would you like to give this feature (' + (featureSettings.name).toUpperCase() +') ?');
                 var access = featureSettings.accessibility;
                 if (access == null) {
-                 access = prompt('Is this accessible? Please type y or n.');
+                 access = prompt('Is this feature (' + featureSettings.name + ') accessible? Please type y or n.');
                  /*
                     $('#inputAccess').show();
                     //$('#inputAccess').focus();

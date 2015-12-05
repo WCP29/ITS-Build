@@ -50,7 +50,10 @@ $( document ).ready(function() {
     $('#myCanvas').attr('height', $('#myCanvas').css('height'));
     $('#myCanvas').attr('width', $('#myCanvas').css('width'));
     
-    //startModal();
+    //$('#modal').hide();
+    
+    startModal();
+    exitModal();
     
     //$('#inputAccess').hide();
     //$('#inputID').hide();
@@ -77,12 +80,79 @@ of the Canvas.
  FUNCTION STATUS: INCOMPLETE!
 */
 function startModal() {
+    $("#whatFloor, #floorOptions, #OKButton, #buildingOptions").hide();
     $(".overlay").fadeIn(1000);
     $("#menu, #myCanvas").hide();
+    $('#whatBuilding').on('focus click', function () {
+        $("#buildingOptions").fadeIn('slow');
+    });
+    searchBuilding();
+    searchFloor();
     
     /*****
     Currently a template of the opening modal, but has absolutely no functionality just yet.
     ******/
+}
+
+function searchBuilding() {
+	$('#whatBuilding').keyup(function() {
+    	var searchforitem = $(this).val();
+    		if(searchforitem != null) {
+    		    $('#buildingOptions').children().each(function(){
+    		    	if ($(this).text().search(new RegExp(searchforitem, "i")) < 0) {
+    			    	$(this).fadeOut();
+    			    }
+    			    else {
+    			    	$(this).show();
+    		    	}
+    		    })
+    		}
+		})
+	$("#buildingOptions li").on('click', function(e) {
+	    e.preventDefault();
+	    var selectedBuilding = $(this).children().text();
+	    $('#whatBuilding').val('');
+	    $('#whatBuilding').attr("placeholder", selectedBuilding);
+	    $("#buildingOptions").fadeOut(1000, function () {
+	         $("#whatFloor").fadeIn();
+	    });
+	})
+}
+
+function searchFloor() {
+     $('#whatFloor').on('focus click', function () {
+        $("#floorOptions").fadeIn('slow');
+    });
+    $('#whatFloor').keyup(function() {
+    	var searchforitem = $(this).val();
+    		if(searchforitem != null) {
+    		    $('#floorOptions').children().each(function(){
+    		    	if ($(this).text().search(new RegExp(searchforitem, "i")) < 0) {
+    			    	$(this).fadeOut();
+    			    }
+    			    else {
+    			    	$(this).show();
+    		    	}
+    		    })
+    		}
+		})
+	$("#floorOptions li").on('click', function(e) {
+	    e.preventDefault();
+	    var selectedFloor = $(this).children().text();
+	    $('#whatFloor').val('');
+	    $('#whatFloor').attr("placeholder", selectedFloor);
+	    $("#floorOptions").fadeOut(1000, function () {
+	         $("#OKButton").fadeIn();
+	    });
+	})
+}
+function exitModal() {
+    $('#OKButton').on('click', function () {
+        $('#myCanvas, #menu').show();
+        $('#modal').fadeOut();
+        
+        // LOAD THE IMAGE OF THE SELECTED BLUEPRINT AS THE BACKGROUND OF CANVAS!!
+    })
 }
 
 //Function that constantly displays where the mouse is.

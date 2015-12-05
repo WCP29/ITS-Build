@@ -32,10 +32,38 @@
 }
 #whatBuilding {
     margin-top: 15%;
+    margin-bottom: 10px;
 }
 #whatFloor {
    margin-top: 7%; 
 }
+#buildingOptions, #floorOptions {
+    background-color: transparent;
+    color: white;
+    width: 400px;
+    margin-left: 420px;
+}
+#buildingOptions > li, #floorOptions > li {
+    padding: 5px;
+    list-style: none;
+    border-radius: 2px;
+    cursor: pointer;
+}
+#buildingOptions > li:hover, #floorOptions >li:hover {
+    background-color: rgba(255,255,255,.1);
+}
+#OKButton {
+    background-color: transparent;
+    border-radius: 3px;
+    border: 1px solid white;
+    height: 60px;
+    width: 300px;
+    margin-top: 40px;
+}
+#OKButton:hover {
+    background-color: rgba(255,255,255,.1);
+}
+
 /*Menu Section*/
 #menu {
     position: fixed;
@@ -118,7 +146,7 @@
 	border-color: white;
 }
 
-#inputID:focus, #inputAccess:focus #whatFloor:focus, #whatBuilding:focus {
+#inputID:focus, #inputAccess:focus #whatFloor:focus, #whatBuilding:focus, #whatFloor:focus {
 	outline: none;	
 }
 ::-webkit-input-placeholder {

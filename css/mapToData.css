@@ -41,7 +41,7 @@
     background-color: transparent;
     color: white;
     width: 400px;
-    margin-left: 420px;
+    margin-left: 33%;
 }
 #buildingOptions > li, #floorOptions > li {
     padding: 5px;
@@ -58,7 +58,7 @@
     border: 1px solid white;
     height: 60px;
     width: 300px;
-    margin-top: 40px;
+    margin-top: 30px;
 }
 #OKButton:hover {
     background-color: rgba(255,255,255,.1);

@@ -40,6 +40,7 @@ var nodeID = 0;
 var lineID = 0;
 var pathGen = false;
 var restorePoints = []; // For undo function
+var tempFeatureLength = 0;
 //var featID = null;
 //var access = null;
 
@@ -64,8 +65,9 @@ $( document ).ready(function() {
   
   handleCanvasClick();
   
-  //undoDrawing();
-  //redoDrawing();
+  if (!tempFeatureLength) {
+      undoDrawing();
+  }
   
   outputJSON();
 
@@ -249,6 +251,11 @@ function handleCanvasClick() {
                     cvs.strokeStyle = '#7D26CD';
                     cvs.stroke();
                     lineID++;
+                    
+                //Store for temporary restore point for Undo function:
+                var imgSrc = this.toDataURL("image/png");
+                restorePoints.push(imgSrc);
+                    
                     // Store data to JSON
                  var d = Math.sqrt((e.pageX -= mouse.x)*e.pageX + (e.pageY-= mouse.y)*e.pageY);
                     features.push({
@@ -304,6 +311,11 @@ function handleCanvasClick() {
                 ctx.stroke();
                 ctx.closePath();
                 ctx.fill();
+                
+                //Store for temporary restore point for Undo function:
+                var imgSrc = this.toDataURL("image/png");
+                restorePoints.push(imgSrc);
+                
         /*        
                     $('#inputID').show();
                     if (!featID) {
@@ -445,10 +457,10 @@ function undoDrawing() {
                 console.log('Removed:' + removedFeature);
                 console.log('features after POP: \n');
                 console.log(JSON.stringify(features));
-                var canvas = document.getElementById('myCanvas');
+                /*var canvas = document.getElementById('myCanvas');
                 var ctx= canvas.getContext("2d");
                 var imgSrc = canvas.toDataURL("image/png");
-                restorePoints.push(imgSrc);
+                restorePoints.push(imgSrc);*/
                 //console.log('restorePoints: ' + restorePoints);
                 
                 var oImg = new Image();

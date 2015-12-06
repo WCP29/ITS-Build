@@ -4,23 +4,23 @@ Goals and Notes (statuses):
     *************COMPLETE****************************************************************************
     *    - DEBUG the constant onclick handler. The a consecutive feature will be interfered with    *
     *    a previous feature, even with on and off flags I have set for them. Going to fix this      *
-    *    by rewriting the functions that implement this.                                            *
+    *    by rewriting the functions that implement this.                                            *    
+    *                                                                                               *
+    *        -- DEBUG: CLICK and drag position of the node changes the nodes.                       *
+    *    *** Status: COMPLETE!                                                                      *
     *************************************************************************************************
-            -- DEBUG: CLICK and drag position of the node changes the nodes.
-        *** Status:
-                    -
     
     - IMPLEMENT a modal upon loading where ITS is asked for a form input. They will be asked
     what building they wish to work with and what floor they want to populate. This will then
     interact with jQuery/Javascript that will run on CASE or IF conditions where it will recognize
     what blueprint image to load. The building name and floor name will be fed as the names of the
     arrays that the information will be stored in.
-         *** Status:
+         *** Status: 90% Complete
                     -
     
     - UPLOAD all of the blueprints to the images folder. Perhaps rename the images folder to 
     "Blueprints".
-         *** Status:
+         *** Status: Security Precaution necessary.
                     -
     
     - DEVELOP function to extract from JSON or our SQL tables to automatically populate the blueprints
@@ -28,7 +28,7 @@ Goals and Notes (statuses):
          *** Status:
                     -
     - Implement UNDO function that removes node or hall that was just made from the canvas and the JSON
-        *** Status:
+        *** Status: Prototype but glitchy.
                     -
     
 */
@@ -227,7 +227,7 @@ function handleCanvasClick() {
         x: -1,
         y: -1
         };
-    $('#myCanvas').on('click', function(e) {
+    $('#myCanvas').on('mousedown', function(e) {
         var featureSettings = getFeatureSettings();
         
         if (!featureSettings) {

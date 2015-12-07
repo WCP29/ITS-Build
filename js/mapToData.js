@@ -86,13 +86,14 @@ function startModal() {
     $(".overlay").fadeIn(1000);
     $("#menu, #myCanvas").hide();
     $('#whatBuilding').on('focus click', function () {
+        $('#whatFloor, #OKButton').fadeOut();
         $("#buildingOptions").fadeIn('slow');
     });
     searchBuilding();
     searchFloor();
     
     /*****
-    Currently a template of the opening modal, but has absolutely no functionality just yet.
+    Currently a template of the opening modal, but has 90% functionality.
     ******/
 }
 

@@ -10,6 +10,7 @@
 	margin: 0;
 	z-index: 1000;
 	display: none;
+	overflow: hidden;
 }
 .overlay > .content {
     position: absolute;
@@ -18,6 +19,7 @@
     text-align: center;
 }
 #modal-title {
+    margin-top: 60px;
     font-size: 60px;
     text-align: center;
 }
@@ -31,17 +33,21 @@
 	border-color: white;
 }
 #whatBuilding {
-    margin-top: 15%;
+    margin-top: 10%;
     margin-bottom: 10px;
 }
 #whatFloor {
    margin-top: 7%; 
 }
+
 #buildingOptions, #floorOptions {
     background-color: transparent;
     color: white;
     width: 400px;
-    margin-left: 33%;
+    text-align: center;
+    margin: 0 auto;
+    z-index: 700;
+    /*margin-left: 33%;*/
 }
 #buildingOptions > li, #floorOptions > li {
     padding: 5px;

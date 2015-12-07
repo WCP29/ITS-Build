@@ -7,7 +7,13 @@ Goals and Notes (statuses):
     *    by rewriting the functions that implement this.                                            *    
     *                                                                                               *
     *        -- DEBUG: CLICK and drag position of the node changes the nodes.                       *
-    *    *** Status: COMPLETE!                                                                      *
+    *                                                                       *
+    *                                                                                               *
+    * - Implement UNDO function that removes node or hall that was just made from the canvas        *
+    * and the JSON                                                                                  *
+    *                                                                     *
+    *                                                                                               *
+    *                                                                                               *
     *************************************************************************************************
     
     - IMPLEMENT a modal upon loading where ITS is asked for a form input. They will be asked
@@ -26,10 +32,6 @@ Goals and Notes (statuses):
     - DEVELOP function to extract from JSON or our SQL tables to automatically populate the blueprints
     we or ITS has already configured. THIS CAN BE DUPLICATED FOR THE USER MODE!
          *** Status:
-                    -
-    - Implement UNDO function that removes node or hall that was just made from the canvas and the JSON
-        *** Status: Prototype but glitchy.
-                    -
     
 */
 
@@ -65,9 +67,7 @@ $( document ).ready(function() {
   
   handleCanvasClick();
   
-  if (!tempFeatureLength) {
-      undoDrawing();
-  }
+  undoDrawing();
   
   outputJSON();
 
@@ -230,19 +230,22 @@ function handleCanvasClick() {
         x: -1,
         y: -1
         };
-    $('#myCanvas').on('mousedown', function(e) {
+    $('#myCanvas').on('click', function(e) {
         var featureSettings = getFeatureSettings();
         
         if (!featureSettings) {
-          console.log('Select something from the features menu!');
+          alert('Select something from the features menu!');
           return;
         }
         
-       // undoDrawing();
         if (featureSettings.name == 'hallway') {
+            
             /*Function that generates a path on the screen!*/
             var cvs = $("#myCanvas")[0].getContext("2d");
                 if(mouse.x != -1 && mouse.y != -1){
+                     //Store for temporary restore point for Undo function:
+                    var imgSrc = this.toDataURL("image/png");
+                    restorePoints.push(imgSrc);
                     cvs.beginPath();
                     cvs.moveTo(mouse.x, mouse.y);
                     cvs.lineTo(e.pageX, e.pageY);
@@ -252,10 +255,6 @@ function handleCanvasClick() {
                     cvs.strokeStyle = '#7D26CD';
                     cvs.stroke();
                     lineID++;
-                    
-                //Store for temporary restore point for Undo function:
-                var imgSrc = this.toDataURL("image/png");
-                restorePoints.push(imgSrc);
                     
                     // Store data to JSON
                  var d = Math.sqrt((e.pageX -= mouse.x)*e.pageX + (e.pageY-= mouse.y)*e.pageY);
@@ -289,10 +288,14 @@ function handleCanvasClick() {
                 console.log('features after push: \n');
                 console.log(JSON.stringify(features));
                 
-                 //undoDrawing();
-                 //redoDrawing();
         }
         else {
+            
+              //Store for temporary restore point for Undo function:
+                var imgSrc = this.toDataURL("image/png");
+                restorePoints.push(imgSrc);
+            
+            
            /*Function that actually adds the nodes to the canvas. It intakes what feature it is adding,
             the color for that node (each feature has its own color (except some) and if the feature is 
             accessible. It will then input that information into the array of objects.*/
@@ -312,10 +315,6 @@ function handleCanvasClick() {
                 ctx.stroke();
                 ctx.closePath();
                 ctx.fill();
-                
-                //Store for temporary restore point for Undo function:
-                var imgSrc = this.toDataURL("image/png");
-                restorePoints.push(imgSrc);
                 
         /*        
                     $('#inputID').show();
@@ -369,15 +368,6 @@ function handleCanvasClick() {
                    console.log('features after push: \n');
                    console.log(JSON.stringify(features));
                    
-                    //undoDrawing();
-                    //redoDrawing();
-                    
-                    
-                    /****************DEBUG ATTEMPT ***********/
-                
-                    
-                    
-                    /****************DEBUG ATTEMPT ***********/
            
         }
   });
@@ -429,22 +419,9 @@ function getFeatureSettings() {
 
 // All of the below function will help contribute to the UNDO / REDO capabilities
 function undoDrawing() {
-    //var ctx = $('#myCanvas')[0].getContext("2d");
     var undoButton = $('#undoButton');
-    if (features == '') {
-        undoButton.css(
-        {
-            "cursor": "not-allowed"
-        });
-    }
-    else {
-            undoButton.css(
-        {
-            "background-color": "#D9534F",
-            "border": "1px solid #D9534F",
-            "cursor": "pointer"
-        });
-        undoButton.on('click', function(e) {
+    
+        undoButton.on('mousedown', function(e) {
             //Grab from the last element of features and delete it.
             e.preventDefault();
             var lastElement = features[(features.length - 1)];
@@ -452,37 +429,23 @@ function undoDrawing() {
                     lineID--;
                 }
                 else {
-                    nodeID++;
+                    nodeID--;
                 }
                 var removedFeature = features.pop();
                 console.log('Removed:' + removedFeature);
                 console.log('features after POP: \n');
                 console.log(JSON.stringify(features));
-                /*var canvas = document.getElementById('myCanvas');
-                var ctx= canvas.getContext("2d");
-                var imgSrc = canvas.toDataURL("image/png");
-                restorePoints.push(imgSrc);*/
-                //console.log('restorePoints: ' + restorePoints);
                 
                 var oImg = new Image();
-                //console.log('oImg: ' + oImg);
                 oImg.onload = function() {
                     var canvas = document.getElementById('myCanvas');
                     var ctx= canvas.getContext("2d");
-                    // Store the current transformation matrix
-                    //ctx.save();
-                    
-                    // Use the identity matrix while clearing the canvas
-                    //ctx.setTransform(1, 0, 0, 1, 0, 0);
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    
-                    // Restore the transform
-                    //ctx.restore();
                     ctx.drawImage(oImg, 0, 0);
                 }
                 oImg.src = restorePoints.pop();
         });
-    }
+   // }
 }
     
 function redoDrawing() {

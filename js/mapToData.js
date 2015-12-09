@@ -58,9 +58,8 @@ $( document ).ready(function() {
     startModal();
     exitModal();
     
-    //$('#inputAccess').hide();
-    //$('#inputID').hide();
- 
+    $('#inputAccess, #inputID').hide();
+
   getActiveCoordinates();
   
   activeFeature();
@@ -315,18 +314,19 @@ function handleCanvasClick() {
                 ctx.stroke();
                 ctx.closePath();
                 ctx.fill();
-                
-        /*        
-                    $('#inputID').show();
+                /*
+                    var featID;
+                    $('#inputID').fadeIn();
                     if (!featID) {
                          $('#inputID').focus();
                     }
                     $('#inputID').keydown(function(e) {
 		            if (e.which == 13) {
 			            e.preventDefault(); // Do not reload on submission
-			            var featID = $('#inputID').val();
-			            $('#inputID').hide();
-			             $('#inputAccess').focus();
+			            featID = $('#inputID').val();
+			            console.log('featID: ' + featID);
+			            $('#inputID').fadeOut();
+			            //$('#inputAccess').focus();
 		            } 
                 })
             */
@@ -335,20 +335,18 @@ function handleCanvasClick() {
                 if (access == null) {
                  access = prompt('Is this feature (' + featureSettings.name + ') accessible? Please type y or n.');
                  /*
-                    $('#inputAccess').show();
-                    //$('#inputAccess').focus();
+                    $('#inputAccess').fadeIn();
+                    $('#inputAccess').focus();
                     $('#inputAccess').keydown(function(e) {
 		                if (e.which == 13) {
 			                e.preventDefault(); // Do not reload on submission
 			                access = $('#inputAccess').val();
-			                console.log('access');
-			                $('#inputAccess').hide();
+			                console.log('access: ' + access);
+			                $('#inputAccess').fadeOut();
 		                } 
                     }) 
-                 
                  */
                 }
-                
                    features.push({
                        node_id : 'node' + nodeID,
                        feat_name: featureSettings.name,
@@ -367,8 +365,7 @@ function handleCanvasClick() {
                    });
                    console.log('features after push: \n');
                    console.log(JSON.stringify(features));
-                   
-           
+
         }
   });
 }

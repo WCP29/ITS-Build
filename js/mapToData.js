@@ -510,3 +510,25 @@ function hoverNode(nodeID) {
 
 
 // IMPLEMENT CODE TO GRAB FROM ARRAY TO PHP TO SQL!!!!!!!
+
+function pushToServer(jsonStuff) {
+    var JSONStuff = jsonStuff;
+    var currentDate = new Date();
+    var day = currentDate.getDate();
+    var month = currentDate.getMonth() + 1;
+    var year = currentDate.getFullYear();
+    var date = (month + "/" + day + "/" + year);
+    /*
+    $.ajax({
+        url: "",
+        type: "POST",
+        data: {
+            date: date,
+            Map: jsonStuff
+        }
+    })
+    .done(function() {
+        console.log('I PUSHED TO THE SERVER! HOORAY!');
+    });
+*/
+}

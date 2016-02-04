@@ -69,6 +69,7 @@ $( document ).ready(function() {
   undoDrawing();
   
   outputJSON();
+  
 
 });
 
@@ -472,6 +473,8 @@ function redoDrawing() {
 
 function outputJSON() {
     $('#JSONClick').on('click', function(e) {
+        pushToServer(features);
+        
         e.preventDefault();
         var myWindow = window.open("", "JSON Output", "width=600, height=400");
         myWindow.document.write(JSON.stringify(features));
@@ -518,17 +521,21 @@ function pushToServer(jsonStuff) {
     var month = currentDate.getMonth() + 1;
     var year = currentDate.getFullYear();
     var date = (month + "/" + day + "/" + year);
-    /*
+    
     $.ajax({
-        url: "",
+        url: "pushedData.php",
         type: "POST",
         data: {
             date: date,
-            Map: jsonStuff
+            map: jsonStuff,
+        },
+        success: function(msg,string,jqXHR) {
+            alert(msg.date + msg.map);
         }
     })
-    .done(function() {
+    /*.done(function() {
+        
         console.log('I PUSHED TO THE SERVER! HOORAY!');
     });
-*/
+    */
 }

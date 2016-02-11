@@ -53,10 +53,10 @@ $( document ).ready(function() {
     $('#myCanvas').attr('height', $('#myCanvas').css('height'));
     $('#myCanvas').attr('width', $('#myCanvas').css('width'));
     
-    //$('#modal').hide();
+    $('#modal').hide();
     
-    startModal();
-    exitModal();
+   // startModal();
+    //exitModal();
     
     $('#inputAccess, #inputID').hide();
 
@@ -515,6 +515,7 @@ function hoverNode(nodeID) {
 // IMPLEMENT CODE TO GRAB FROM ARRAY TO PHP TO SQL!!!!!!!
 
 function pushToServer(jsonStuff) {
+   // var JSONStuff =  JSON.stringify(jsonStuff);
     var JSONStuff = jsonStuff;
     var currentDate = new Date();
     var day = currentDate.getDate();
@@ -522,20 +523,15 @@ function pushToServer(jsonStuff) {
     var year = currentDate.getFullYear();
     var date = (month + "/" + day + "/" + year);
     
-    $.ajax({
-        url: "pushedData.php",
-        type: "POST",
-        data: {
+    var data = 
+        {
             date: date,
-            map: jsonStuff,
-        },
-        success: function(msg,string,jqXHR) {
-            alert(msg.date + msg.map);
-        }
-    })
-    /*.done(function() {
-        
-        console.log('I PUSHED TO THE SERVER! HOORAY!');
+            map: JSONStuff,
+        };
+    
+    $.post("Pusher.php", data, function(returnData) {
+        //If successful, do this:
+        console.log(returnData);
     });
-    */
+ 
 }

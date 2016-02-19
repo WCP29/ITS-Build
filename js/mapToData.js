@@ -43,6 +43,9 @@ var lineID = 0;
 var pathGen = false;
 var restorePoints = []; // For undo function
 var tempFeatureLength = 0;
+var AJAXBuilding = '';
+var AJAXFloor = '';
+
 //var featID = null;
 //var access = null;
 
@@ -55,8 +58,8 @@ $( document ).ready(function() {
     
     $('#modal').hide();
     
-   // startModal();
-    //exitModal();
+   startModal();
+    exitModal();
     
     $('#inputAccess, #inputID').hide();
 
@@ -114,6 +117,34 @@ function searchBuilding() {
 	$("#buildingOptions li").on('click', function(e) {
 	    e.preventDefault();
 	    var selectedBuilding = $(this).children().text();
+	    
+	    //Take SelectedBuilding and compare it with the Building values to assign the correct AJAXBuilding code for the GET call!
+	    function setAJAXBuilding() {
+            switch (selectedBuilding) {
+                case "Academic A":
+                  return "academic_a";
+                
+                case "Old Union":
+                    return "old_union";
+                    
+                case "West Union":
+                    return "west_union";
+                    
+                case "Engineering Building":
+                  return "engineering_building";
+                  
+                case "Fine Arts":
+                    return "fine_arts";
+                    
+                default: 
+                    return '';
+              } 
+        }
+        /*Display what building was selected so it can be pushed as part of the data that needs to be organized for the GET and POST calls.*/
+        AJAXBuilding  = setAJAXBuilding();
+	    
+	    
+	    
 	    $('#whatBuilding').val('');
 	    $('#whatBuilding').attr("placeholder", selectedBuilding);
 	    $("#buildingOptions").fadeOut(1000, function () {
@@ -142,6 +173,37 @@ function searchFloor() {
 	$("#floorOptions li").on('click', function(e) {
 	    e.preventDefault();
 	    var selectedFloor = $(this).children().text();
+	    
+	    
+	    //Take SelectedFloor and compare it with the Building values to assign the correct AJAXFloor code for the GET call!
+        function setAJAXFloor() {
+            switch (selectedFloor) {
+                case "Basement":
+                  return "Basement";
+                
+                case "1":
+                    return "1";
+                    
+                case "2":
+                    return "2";
+                    
+                case "3":
+                  return "3";
+                  
+                case "4":
+                    return "4";
+                    
+                case "5":
+                    return "5";
+                    
+                default: 
+                    return '';
+              } 
+        }
+        /*Display what floor was selected so it can be pushed as part of the data that needs to be organized for the GET and POST calls.*/
+        AJAXFloor  = setAJAXFloor();
+	    
+	    
 	    $('#whatFloor').val('');
 	    $('#whatFloor').attr("placeholder", selectedFloor);
 	    $("#floorOptions").fadeOut(1000, function () {
@@ -155,6 +217,9 @@ function exitModal() {
         $('#modal').fadeOut();
         
         // LOAD THE IMAGE OF THE SELECTED BLUEPRINT AS THE BACKGROUND OF CANVAS!!
+        
+        /*AJAX GET REQUEST FOR DATA that already exists.*/
+        drawData();
     })
 }
 
@@ -214,7 +279,7 @@ function activeFeature() {
                 case "feat-hallway":
                     return { name: "Hallway"};
                 default: 
-                    return { name: "Hallway"};
+                    return { name: ""};
               } 
         }
         /*Display what feature was selected*/
@@ -259,6 +324,8 @@ function handleCanvasClick() {
                     // Store data to JSON
                  var d = Math.sqrt((e.pageX -= mouse.x)*e.pageX + (e.pageY-= mouse.y)*e.pageY);
                     features.push({
+                       building : AJAXBuilding,
+                       floor: AJAXFloor,
                        node_id : 'Hallway' + lineID,
                        feat_name: featureSettings.name,
                        feat_id : featureSettings.name + lineID,
@@ -269,6 +336,8 @@ function handleCanvasClick() {
                        distance : d,
                    });
                    temp.unshift({
+                       building : AJAXBuilding,
+                       floor: AJAXFloor,
                        node_id : 'Hallway' + lineID,
                        feat_name: featureSettings.name,
                        feat_id : featureSettings.name + lineID,
@@ -349,6 +418,8 @@ function handleCanvasClick() {
                  */
                 }
                    features.push({
+                       building : AJAXBuilding,
+                       floor: AJAXFloor,
                        node_id : 'node' + nodeID,
                        feat_name: featureSettings.name,
                        feat_id : featureSettings.name + featID,
@@ -357,6 +428,8 @@ function handleCanvasClick() {
                        accessible : access
                    });
                    temp.unshift({
+                       building : AJAXBuilding,
+                       floor: AJAXFloor,
                        node_id : 'node' + nodeID,
                        feat_name: featureSettings.name,
                        feat_id : featureSettings.name + featID,
@@ -534,4 +607,19 @@ function pushToServer(jsonStuff) {
         console.log(returnData);
     });
  
+}
+
+function drawData() {
+        console.log('executing draw data.');
+         $.ajax({    //create an ajax request to load_page.php
+            type: "GET",
+            url: "Pusher.php",             
+            data: { building_info : AJAXBuilding, floor_info : AJAXFloor},
+            success: function(response){                    
+                 console.log(response);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                console.log("Status: " + textStatus); console.log("Error: " + errorThrown); 
+            }  
+        });
 }

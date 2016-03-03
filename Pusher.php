@@ -83,7 +83,7 @@
             $y_cord = (int) $row['y_cord'];
             $access = ( $row['accessible'] );
     
-            $valuesArr[] = "('$buildingName', '$floorNumber', '$node_id', '$feat_name', '$feat_id', '$x_cord', '$y_cord', '$access')";
+            $valuesArr[] = "('$buildingName', '$floorNumber', '$node_id', '$feat_name', '$feat_id', '$x_cord', '$y_cord', '$access');";
         }
     
         $sql .= implode(',', $valuesArr);
@@ -127,45 +127,18 @@
 */    
    
 
-    $sql = "SELECT feat_name, x_cord, y_cord from SamplePush where buildingName = '$building_info' and floorNumber = '$floor_name'";
-    //$query = mysql_query($sql, $db);
-
-   // $row = mysql_fetch_array($query);
-        /*
-        $featName = $row['feat_name'];
-        $xCord = $row['x_cord'];
-        $yCord = $row['y_cord'];
-        
-        echo "stored row values to each respective element. \n";
-        
-        echo $featName;
-        echo $xCord;
-        echo $yCord;
-        */
-        $attemptToWork = $connection->query($sql);
-        if ($attemptToWork === TRUE) {
-            
-            
-          /*  
-            $featName = $row['feat_name'];
-            $xCord = $row['x_cord'];
-            $yCord = $row['y_cord'];
-            */
-            echo "stored row values to each respective element. \n";
-            /*
-            echo $featName;
-            echo $xCord;
-            echo $yCord;
-            */
-            echo "Data grabbed from SamplePush  successfully \n";
-        } 
-        else {
-            echo "Error grabbing data from SamplePush: " . $connection->error;
+    $sql = "SELECT feat_name, x_cord, y_cord from SamplePush where buildingName = '$building_info' and floorNumber = '$floor_name';";
+    
+       $result = $connection->query($sql);
+       if ($result->num_rows > 0) {
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                echo "Feature: " . $row["feat_name"]. " Coordinates: " . $row["x_cord"]. ", " . $row["y_cord"]. "\n";
+            }
+        } else {
+            echo "0 results";
         }
         
-        /////////////////////
-        
-        /////////////////////
     $connection->close();
     
     //// sprintf -- get rid of $ variables and use sprintf.
